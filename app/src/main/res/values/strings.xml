@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">music</string>
+    <string name="login">登录</string>
+    <string name="registered">注册</string>
+    <string name="please_enter_user_name">请输入用户名</string>
+    <string name="please_enter_password">请输入密码</string>
+    <string name="register_an_account">注册一个账号</string>
+    <string name="cancel">取消</string>
+    <string name="please_input_username">请输入用户名</string>
+    <string name="please_input_password">请输入密码</string>
+    <string name="successfully_created_an_account">成功创建账号</string>
+    <string name="user_name_has_been_registered">用户名已被注册，请输入其他用户名</string>
+    <string name="CHANGE_THEME">改变主题</string>
+    <string name="remembler_username_password">记住用户名和密码</string>
+    <string name="wrong_user_pwd">错误的用户名或密码，请重新输入</string>
+    <string name="user_pwd_empty">账号和密码不能为空</string>
+</resources>
