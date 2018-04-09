@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         android.support.v7.app.ActionBar actionBar=getSupportActionBar();
         if (actionBar!=null){
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_18dp);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
         mList=Scan.getMusicData(context);
         Adaper mAdapter=new Adaper(mList,context);

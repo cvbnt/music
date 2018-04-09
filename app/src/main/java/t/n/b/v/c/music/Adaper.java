@@ -1,5 +1,6 @@
 package t.n.b.v.c.music;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,13 +14,16 @@ import java.util.List;
 public class Adaper extends RecyclerView.Adapter <RecyclerView.ViewHolder>{
     private Context mContext;
     private List<Music> mList;
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+//    private OnMusicItemListener mListener;
+    public class MyViewHolder extends RecyclerView.ViewHolder {
+        View MyView;
         TextView mPosition;
         TextView mName;
         TextView mSinger;
         TextView mDuration;
         public MyViewHolder(View itemView) {
             super(itemView);
+            MyView=itemView;
             mPosition=itemView.findViewById(R.id.item_music_num_tv);
             mName=itemView.findViewById(R.id.item_music_center_name);
             mSinger=itemView.findViewById(R.id.item_music_center_author);
@@ -29,6 +33,7 @@ public class Adaper extends RecyclerView.Adapter <RecyclerView.ViewHolder>{
     public Adaper(List<Music> list,Context context){
         mList=list;
         mContext=context;
+  //      mListener=listener;
     }
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -47,5 +52,9 @@ public class Adaper extends RecyclerView.Adapter <RecyclerView.ViewHolder>{
     @Override
     public int getItemCount() {
         return mList.size();
+    }
+
+    public interface OnMusicItemListener {
+        void onMusicClick(int position, Music music);
     }
 }
