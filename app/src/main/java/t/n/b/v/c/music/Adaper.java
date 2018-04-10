@@ -11,10 +11,22 @@ import android.widget.TextView;
 import java.net.MalformedURLException;
 import java.util.List;
 
-public class Adaper extends RecyclerView.Adapter <RecyclerView.ViewHolder>{
+public class Adaper extends RecyclerView.Adapter <RecyclerView.ViewHolder>implements View.OnClickListener{
     private Context mContext;
     private List<Music> mList;
-//    private OnMusicItemListener mListener;
+    private OnItemClickListener mOnItemClickListener = null;
+
+    @Override
+    public void onClick(View view) {
+        if (mOnItemClickListener!=null){
+            mOnItemClickListener.onItemClick(view,(int)view.getTag());
+        }
+    }
+
+    public void setmOnItemClickListener(OnItemClickListener mOnItemClickListener) {
+        this.mOnItemClickListener=mOnItemClickListener;
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         View MyView;
         TextView mPosition;
@@ -33,11 +45,15 @@ public class Adaper extends RecyclerView.Adapter <RecyclerView.ViewHolder>{
     public Adaper(List<Music> list,Context context){
         mList=list;
         mContext=context;
-  //      mListener=listener;
     }
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new MyViewHolder(LayoutInflater.from(mContext).inflate(R.layout.list_item, parent, false));
+   //     return new MyViewHolder(LayoutInflater.from(mContext).inflate(R.layout.list_item, parent, false));
+        View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+        MyViewHolder viewHolder=new MyViewHolder(view);
+        view.setOnClickListener(this);
+        return viewHolder;
+
     }
 
     @Override
@@ -47,6 +63,7 @@ public class Adaper extends RecyclerView.Adapter <RecyclerView.ViewHolder>{
         ((MyViewHolder)holder).mName.setText(music.getName());
         ((MyViewHolder)holder).mSinger.setText(music.getSinger());
         ((MyViewHolder)holder).mDuration.setText(Scan.formatTime(music.getDuration()));
+        ((MyViewHolder)holder).itemView.setTag(position);
     }
 
     @Override
@@ -54,7 +71,8 @@ public class Adaper extends RecyclerView.Adapter <RecyclerView.ViewHolder>{
         return mList.size();
     }
 
-    public interface OnMusicItemListener {
-        void onMusicClick(int position, Music music);
+
+    public static interface OnItemClickListener {
+        void onItemClick(View view , int position);
     }
 }
