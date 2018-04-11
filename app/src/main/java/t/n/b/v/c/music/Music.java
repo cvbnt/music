@@ -6,6 +6,7 @@ public class Music {
     public String path;
     public long size;
     public int duration;
+
     public String getName() {
         return name;
     }

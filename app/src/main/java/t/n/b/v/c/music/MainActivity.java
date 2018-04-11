@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.SeekBar;
 
 import java.util.ArrayList;
@@ -40,7 +41,17 @@ public class MainActivity extends AppCompatActivity{
         mAdapter.setmOnItemClickListener(new Adaper.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                startActivity(new Intent(MainActivity.this,Play.class));
+                Intent intent=new Intent(MainActivity.this,Play.class);
+                Music music=mList.get(position);
+                String mName=music.getName();
+                String mSinger=music.getSinger();
+                String mDuration=Scan.formatTime(music.getDuration());
+                String mPath=music.getPath();
+                intent.putExtra("extra_name",mName);
+                intent.putExtra("extra_singer",mSinger);
+                intent.putExtra("extra_duration",mDuration);
+                intent.putExtra("extra_path",mPath);
+                startActivity(intent);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
