@@ -42,15 +42,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onItemClick(View view, int position) {
                 Intent intent=new Intent(MainActivity.this,Play.class);
-                Music music=mList.get(position);
-                String mName=music.getName();
-                String mSinger=music.getSinger();
-                String mDuration=Scan.formatTime(music.getDuration());
-                String mPath=music.getPath();
-                intent.putExtra("extra_name",mName);
-                intent.putExtra("extra_singer",mSinger);
-                intent.putExtra("extra_duration",mDuration);
-                intent.putExtra("extra_path",mPath);
+                intent.putExtra("extra_position",position);
                 startActivity(intent);
             }
         });

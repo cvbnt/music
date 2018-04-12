@@ -1,5 +1,6 @@
 package t.n.b.v.c.music;
 
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -10,7 +11,16 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import static java.lang.StrictMath.abs;
+
 public class Play extends AppCompatActivity {
+    String m_Path;
+    String m_Name;
+    String m_Singer;
+    String m_Duration;
+    int m_size;
+    Music music;
+    int mGetPosition;
     private SeekBar mSeekBar;
     private ImageButton mPrevious;
     private ImageButton mPlay;
@@ -24,17 +34,20 @@ public class Play extends AppCompatActivity {
     private MediaPlayer mMediaPlayer=new MediaPlayer();
     private static int DRAWABLE_STATE=0;
     private Handler mHandler;
+    private Context context;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.music_play);
+        context=Play.this;
+        m_size=Scan.getMusicData(context).size();
         Intent intent=getIntent();
-        String mPath=intent.getStringExtra("extra_path");
-        String mGetName=intent.getStringExtra("extra_name").replace(".mp3","");
-        String mGetSinger=intent.getStringExtra("extra_singer");
-        String mGetDuration=intent.getStringExtra("extra_duration");
-        initMediaPlayer(mPath);
+        mGetPosition = intent.getExtras().getInt("extra_position");
         fvbi();
+        refresh();
+        initMediaPlayer(m_Path);
+        m_size=Scan.getMusicData(context).size();
+        mSeekBar.setMax(mMediaPlayer.getDuration());
         setSupportActionBar(mToolBar);
         mImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,10 +55,6 @@ public class Play extends AppCompatActivity {
                 startActivity(new Intent(Play.this,MainActivity.class));
             }
         });
-        mName.setText(mGetName);
-        mSinger.setText(mGetSinger);
-        mDurationTime.setText(mGetDuration);
-        mSeekBar.setMax(mMediaPlayer.getDuration());
         mPlay.setOnClickListener(view -> {
             if (DRAWABLE_STATE==0){
                 mPlay.setImageDrawable(getDrawable(R.drawable.ic_pause));
@@ -59,6 +68,30 @@ public class Play extends AppCompatActivity {
                 if (mMediaPlayer.isPlaying()){
                     mMediaPlayer.pause();        //暂停
                 }
+            }
+        });
+        mPrevious.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mGetPosition = mGetPosition-1;
+                if (mGetPosition<0){
+                    mGetPosition=m_size-(abs(mGetPosition)%m_size);
+                }
+                refresh();
+                initMediaPlayer(m_Path);
+                mSeekBar.setMax(mMediaPlayer.getDuration());
+            }
+        });
+        mNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mGetPosition = mGetPosition+1;
+                if (mGetPosition>=0){
+                    mGetPosition=abs(mGetPosition)%m_size;
+                }
+                refresh();
+                initMediaPlayer(m_Path);
+                mSeekBar.setMax(mMediaPlayer.getDuration());
             }
         });
         mHandler=new Handler();
@@ -91,7 +124,16 @@ public class Play extends AppCompatActivity {
             }
         });
     }
-
+    private void refresh(){
+        music=Scan.getMusicData(context).get(mGetPosition);
+        m_Path=music.getPath();
+        m_Name=music.getName().replace(".mp3","");
+        m_Singer=music.getSinger();
+        m_Duration=Scan.formatTime(music.getDuration());
+        mName.setText(m_Name);
+        mSinger.setText(m_Singer);
+        mDurationTime.setText(m_Duration);
+    }
     private void fvbi() {
         mSeekBar=findViewById(R.id.seekBar);
         mPrevious=findViewById(R.id.previousButton);
@@ -113,13 +155,18 @@ public class Play extends AppCompatActivity {
         }
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
         if (mMediaPlayer!=null){
             mMediaPlayer.stop();
             mMediaPlayer.release(); //APP处于onDestroy时释放MediaPlayer的资源
         }
+        mHandler.removeCallbacksAndMessages(null);
     }
 }
