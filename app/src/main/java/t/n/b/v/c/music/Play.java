@@ -4,15 +4,11 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Play extends AppCompatActivity {
     private SeekBar mSeekBar;
@@ -27,9 +23,7 @@ public class Play extends AppCompatActivity {
     private android.support.v7.widget.Toolbar mToolBar;
     private MediaPlayer mMediaPlayer=new MediaPlayer();
     private static int DRAWABLE_STATE=0;
-    private Timer mTimer;
-    private TimerTask mTimerTask;
-    private final int UP_TIME = 1;
+    private Handler mHandler;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +45,7 @@ public class Play extends AppCompatActivity {
         mName.setText(mGetName);
         mSinger.setText(mGetSinger);
         mDurationTime.setText(mGetDuration);
+        mSeekBar.setMax(mMediaPlayer.getDuration());
         mPlay.setOnClickListener(view -> {
             if (DRAWABLE_STATE==0){
                 mPlay.setImageDrawable(getDrawable(R.drawable.ic_pause));
@@ -58,7 +53,7 @@ public class Play extends AppCompatActivity {
                 if (!mMediaPlayer.isPlaying()){
                     mMediaPlayer.start();        //播放
                 }
-            }else{
+                }else{
                 mPlay.setImageDrawable(getDrawable(R.drawable.ic_play));
                 DRAWABLE_STATE=0;
                 if (mMediaPlayer.isPlaying()){
@@ -66,11 +61,22 @@ public class Play extends AppCompatActivity {
                 }
             }
         });
-        mSeekBar.setMax(mMediaPlayer.getDuration());
+        mHandler=new Handler();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(mMediaPlayer != null){
+                    int mCurrentPosition = mMediaPlayer.getCurrentPosition();
+                    mSeekBar.setProgress(mCurrentPosition);
+                    mNowTime.setText(Scan.formatTime(mCurrentPosition));
+                }
+                mHandler.postDelayed(this, 1000);
+            }
+        });
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mMediaPlayer.pause();
+
             }
 
             @Override
@@ -85,8 +91,6 @@ public class Play extends AppCompatActivity {
             }
         });
     }
-
-
 
     private void fvbi() {
         mSeekBar=findViewById(R.id.seekBar);

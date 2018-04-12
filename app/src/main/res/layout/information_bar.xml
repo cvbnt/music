@@ -22,6 +22,7 @@
             app:srcCompat="@drawable/ic_arrow_back_white" />
 
         <t.n.b.v.c.music.MarqueeTextView
+            android:textColor="@color/white"
             android:id="@+id/tv_name"
             android:ellipsize="marquee"
             android:singleLine="true"
@@ -35,6 +36,7 @@
             tools:text="歌曲名" />
 
         <t.n.b.v.c.music.MarqueeTextView
+            android:textColor="@color/white"
             android:ellipsize="marquee"
             android:focusable="true"
             android:marqueeRepeatLimit="marquee_forever"
