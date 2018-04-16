@@ -21,6 +21,7 @@ public class Play extends AppCompatActivity {
     String m_Name;
     String m_Singer;
     String m_Duration;
+    String m_Path_Lrc;
     int m_size;
     Music music;
     int mGetPosition;
@@ -43,6 +44,8 @@ public class Play extends AppCompatActivity {
     private static int REPEAT_STATE=0;
     private Handler mHandler;
     private Context context;
+    private LyricView lyricView;
+    private int INTERVAL=45;//歌词每行的间隔
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,9 +59,10 @@ public class Play extends AppCompatActivity {
         fvbi();
         refresh();
         initMediaPlayer(m_Path);
+        searchLrc();
         drawable=mShuffle.getDrawable();
         setSupportActionBar(mToolBar);
-        mHandler=new Handler();
+        Handler mHandler=new Handler();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -66,10 +70,13 @@ public class Play extends AppCompatActivity {
                     int mCurrentPosition = mMediaPlayer.getCurrentPosition();
                     mSeekBar.setProgress(mCurrentPosition);
                     mNowTime.setText(Scan.formatTime(mCurrentPosition));
+                    lyricView.setOffsetY(lyricView.getOffsetY() - lyricView.SpeedLrc());
+                    lyricView.SelectIndex(mMediaPlayer.getCurrentPosition());
                 }
-                mHandler.postDelayed(this, 1000);
+               mHandler.postDelayed(this, 1000);
+                mHandler.post(mUpdateResults);
             }
-        });
+       });
         mImageButton.setOnClickListener(view -> startActivity(new Intent(Play.this,MainActivity.class)));
         mPlay.setOnClickListener(view -> {
             if (DRAWABLE_STATE==0){
@@ -77,6 +84,8 @@ public class Play extends AppCompatActivity {
                 DRAWABLE_STATE=1;
                 if (!mMediaPlayer.isPlaying()){
                     mMediaPlayer.start();        //播放
+                    lyricView.setOffsetY(220 - lyricView.SelectIndex(mMediaPlayer.getCurrentPosition())
+                            * (lyricView.getSIZEWORD() + INTERVAL-1));
                 }
                 }else{
                 mPlay.setImageDrawable(getDrawable(R.drawable.ic_play));
@@ -117,7 +126,8 @@ public class Play extends AppCompatActivity {
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
+                lyricView.setOffsetY(220 - lyricView.SelectIndex(i)
+                        * (lyricView.getSIZEWORD() + INTERVAL-1));
             }
 
             @Override
@@ -132,10 +142,18 @@ public class Play extends AppCompatActivity {
             }
         });
     }
+
+    private void searchLrc() {
+        LyricView.read(m_Path_Lrc);
+        lyricView.SetTextSize();
+        lyricView.setOffsetY(350);
+    }
+
     private void refresh(){
         music=Scan.getMusicData(context).get(mGetPosition);
         m_Path=music.getPath();
         m_Name=music.getName().replace(".mp3","");
+        m_Path_Lrc=m_Path.replace(".mp3",".lrc");
         m_Singer=music.getSinger();
         m_Duration=Scan.formatTime(music.getDuration());
         mName.setText(m_Name);
@@ -143,6 +161,7 @@ public class Play extends AppCompatActivity {
         mDurationTime.setText(m_Duration);
     }
     private void fvbi() {
+        lyricView=findViewById(R.id.lrcView);
         mSeekBar=findViewById(R.id.seekBar);
         mPrevious=findViewById(R.id.previousButton);
         mNext=findViewById(R.id.nextButton);
@@ -174,6 +193,7 @@ public class Play extends AppCompatActivity {
         }
         refresh();
         initMediaPlayer(m_Path);
+        searchLrc();
         mMediaPlayer.start();
     }
 
@@ -186,6 +206,7 @@ public class Play extends AppCompatActivity {
         }
         refresh();
         initMediaPlayer(m_Path);
+        searchLrc();
         mMediaPlayer.start();
     }
     private void checkState(){
@@ -209,9 +230,35 @@ public class Play extends AppCompatActivity {
             mDurationTime.setText(m_Duration);
             mMediaPlayer.reset();
             initMediaPlayer(m_Path);
+            searchLrc();
             mMediaPlayer.start();
         }
     }
+//    class runable implements Runnable {
+////        @Override
+////        public void run() {
+////            while (true) {
+////                try {
+////                    Thread.sleep(100);
+////                    if (mMediaPlayer.isPlaying()) {
+////                        lyricView.setOffsetY(lyricView.getOffsetY() - lyricView.SpeedLrc());
+////                        lyricView.SelectIndex(mMediaPlayer.getCurrentPosition());
+////                        int mCurrentPosition = mMediaPlayer.getCurrentPosition();
+////                        mSeekBar.setProgress(mCurrentPosition);
+////                        mNowTime.setText(Scan.formatTime(mCurrentPosition));
+////                        mHandler.post(mUpdateResults);
+////                    }
+////                } catch (InterruptedException e) {
+////                    e.printStackTrace();
+////                }
+////            }
+////        }
+////    }
+    Runnable mUpdateResults = new Runnable() {
+        public void run() {
+            lyricView.invalidate(); // 更新视图
+        }
+    };
     @Override
     protected void onDestroy() {
         super.onDestroy();

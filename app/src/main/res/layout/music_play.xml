@@ -24,6 +24,11 @@
         android:layout_height="0dp"
         android:layout_weight="6"
         android:orientation="horizontal">
+        <t.n.b.v.c.music.LyricView
+            android:id="@+id/lrcView"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+             />
     </LinearLayout>
 
     <LinearLayout
