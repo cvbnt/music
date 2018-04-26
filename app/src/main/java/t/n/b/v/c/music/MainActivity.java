@@ -3,16 +3,16 @@ package t.n.b.v.c.music;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Adapter;
-import android.widget.SeekBar;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout mDrawerLayout;
     private Toolbar mToolBar;
     private RecyclerView mRecyclerView;
+    private NavigationView navView;
     private List<Music> mList=new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +31,14 @@ public class MainActivity extends AppCompatActivity{
         mDrawerLayout=findViewById(R.id.drawer_layout);
         mRecyclerView=findViewById(R.id.musicRecycler);
         mToolBar=findViewById(R.id.toolbar);
+        navView=findViewById(R.id.nav_view);
+        navView.setCheckedItem(R.id.nav_stop);
+        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected( MenuItem item) {
+                return true;
+            }
+        });
         setSupportActionBar(mToolBar);
         android.support.v7.app.ActionBar actionBar=getSupportActionBar();
         if (actionBar!=null){
@@ -50,4 +59,13 @@ public class MainActivity extends AppCompatActivity{
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

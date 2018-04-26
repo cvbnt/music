@@ -1,19 +1,17 @@
 package t.n.b.v.c.music;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -21,6 +19,7 @@ import android.widget.Toast;
  * Created by 54654 on 2018/3/17.
  */
 public class Login extends AppCompatActivity {
+    private static int LOGGED=0;
     private static final int REQUEST_STORAGE_PERMISSIONS=0;
     private static final String[] STORAGE_PERMISSIONS=new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -37,12 +36,23 @@ public class Login extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+        checkLogged();
         fvbi();
         dbhelpder=new SqliteHelper(this);
         registerButton.setOnClickListener(view -> {
             Intent intent=new Intent(Login.this,Register.class);
             startActivity(intent);
             dbhelpder.getWritableDatabase();
+        });
+        mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b){
+                    LOGGED=1;
+                }else {
+                    LOGGED=0;
+                }
+            }
         });
         loginButton.setOnClickListener(view -> {
             SQLiteDatabase db=dbhelpder.getWritableDatabase();
@@ -76,6 +86,7 @@ public class Login extends AppCompatActivity {
                 if (loginCode == 1) {
                         if (checkPermissions()){
                             Intent intent = new Intent(Login.this, MainActivity.class);
+                            checkCheck();
                             startActivity(intent);
                         }else {
                             requestPermissions(STORAGE_PERMISSIONS,REQUEST_STORAGE_PERMISSIONS);
@@ -90,6 +101,22 @@ public class Login extends AppCompatActivity {
             }
         });
     }
+
+    private void checkCheck() {
+        SharedPreferences.Editor editor=getSharedPreferences("logged",MODE_PRIVATE).edit();
+        editor.putInt("LOGGED",LOGGED);
+        editor.apply();
+    }
+
+    private void checkLogged() {
+        SharedPreferences pref=getSharedPreferences("logged",MODE_PRIVATE);
+        int logged=pref.getInt("LOGGED",0);
+        if (logged!=LOGGED){
+            Intent intent=new Intent(Login.this,MainActivity.class);
+            startActivity(intent);
+        }
+    }
+
     private void fvbi() {
         userEdit=(EditText)findViewById(R.id.user_enter_register);
         pwdEdit=(EditText) findViewById(R.id.pwd_enter_register);
@@ -108,6 +135,7 @@ public class Login extends AppCompatActivity {
             case REQUEST_STORAGE_PERMISSIONS:
                 if(checkPermissions()){
                     Intent intent = new Intent(Login.this, MainActivity.class);
+                    checkCheck();
                     startActivity(intent);
                 }
                 default:

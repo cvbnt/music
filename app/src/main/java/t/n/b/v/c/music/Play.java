@@ -194,6 +194,7 @@ public class Play extends AppCompatActivity {
         refresh();
         initMediaPlayer(m_Path);
         searchLrc();
+        mPlay.setImageDrawable(getDrawable(R.drawable.ic_pause));
         mMediaPlayer.start();
     }
 
@@ -207,6 +208,7 @@ public class Play extends AppCompatActivity {
         refresh();
         initMediaPlayer(m_Path);
         searchLrc();
+        mPlay.setImageDrawable(getDrawable(R.drawable.ic_pause));
         mMediaPlayer.start();
     }
     private void checkState(){
@@ -234,26 +236,7 @@ public class Play extends AppCompatActivity {
             mMediaPlayer.start();
         }
     }
-//    class runable implements Runnable {
-////        @Override
-////        public void run() {
-////            while (true) {
-////                try {
-////                    Thread.sleep(100);
-////                    if (mMediaPlayer.isPlaying()) {
-////                        lyricView.setOffsetY(lyricView.getOffsetY() - lyricView.SpeedLrc());
-////                        lyricView.SelectIndex(mMediaPlayer.getCurrentPosition());
-////                        int mCurrentPosition = mMediaPlayer.getCurrentPosition();
-////                        mSeekBar.setProgress(mCurrentPosition);
-////                        mNowTime.setText(Scan.formatTime(mCurrentPosition));
-////                        mHandler.post(mUpdateResults);
-////                    }
-////                } catch (InterruptedException e) {
-////                    e.printStackTrace();
-////                }
-////            }
-////        }
-////    }
+
     Runnable mUpdateResults = new Runnable() {
         public void run() {
             lyricView.invalidate(); // 更新视图

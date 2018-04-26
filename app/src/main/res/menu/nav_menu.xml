@@ -5,5 +5,9 @@
             android:id="@+id/nav_theme"
             android:title="@string/CHANGE_THEME"
             />
+        <item
+            android:id="@+id/nav_stop"
+            android:title="停止并退出"
+            />
     </group>
 </menu>
