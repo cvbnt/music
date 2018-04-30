@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 /**
  * Created by 54654 on 2018/3/17.
@@ -32,12 +33,14 @@ public class Login extends AppCompatActivity {
     private Button registerButton;
     private CheckBox mCheckBox;
     private static int loginCode;
+    private android.support.v7.widget.Toolbar mLoginToolBar;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         checkLogged();
         fvbi();
+        setSupportActionBar(mLoginToolBar);
         dbhelpder=new SqliteHelper(this);
         registerButton.setOnClickListener(view -> {
             Intent intent=new Intent(Login.this,Register.class);
@@ -123,6 +126,7 @@ public class Login extends AppCompatActivity {
         loginButton=(Button)findViewById(R.id.login_button);
         registerButton=(Button) findViewById(R.id.register_an_account_button);
         mCheckBox=(CheckBox)findViewById(R.id.checkBox);
+        mLoginToolBar=findViewById(R.id.loginBar);
     }
     private boolean checkPermissions(){
         int result=ContextCompat.checkSelfPermission(Login.this,STORAGE_PERMISSIONS[0]);

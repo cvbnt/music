@@ -65,15 +65,15 @@ public class LyricView extends View {
             // 画当前歌词之后的歌词
             for(int i=lrcIndex+1;i<lrc_map.size();i++){
                 temp=lrc_map.get(i);
-                if(offsetY+(SIZEWORD+INTERVAL)*i>600){
+                if(offsetY+(SIZEWORD+INTERVAL)*i>3000){
                     break;
                 }
                 canvas.drawText(temp.lrc, mX, offsetY+(SIZEWORD+INTERVAL)*i, paint);
             }
         }
         else{
-            paint.setTextSize(25);
-            canvas.drawText("找不到歌词", mX, 310, paint);
+            paint.setTextSize(100);
+            canvas.drawText("找不到歌词,可能是纯音乐", mX, 310, paint);
         }
         super.onDraw(canvas);
     }

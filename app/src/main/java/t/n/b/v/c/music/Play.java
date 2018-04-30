@@ -46,6 +46,10 @@ public class Play extends AppCompatActivity {
     private Context context;
     private LyricView lyricView;
     private int INTERVAL=45;//歌词每行的间隔
+    private static final String TS=".ts";
+    private static final String FLAC=".flac";
+    private static final String MXMF=".mxmf";
+    private static final String RTTTL=".rtttl";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,8 +156,18 @@ public class Play extends AppCompatActivity {
     private void refresh(){
         music=Scan.getMusicData(context).get(mGetPosition);
         m_Path=music.getPath();
-        m_Name=music.getName().replace(".mp3","");
-        m_Path_Lrc=m_Path.replace(".mp3",".lrc");
+        if (m_Path.contains(TS)){
+            m_Name=music.getName().substring(0,music.getName().length()-3);
+            m_Path_Lrc=m_Path.substring(0,m_Path.length()-3)+".lrc";
+        }else if (m_Path.contains(FLAC)||m_Path.contains(MXMF)){
+            m_Name=music.getName().substring(0,music.getName().length()-5);
+            m_Path_Lrc=m_Path.substring(0,m_Path.length()-5)+".lrc";
+        }else if (m_Path.contains(RTTTL)){
+            m_Name=music.getName().substring(0,music.getName().length()-6);
+            m_Path_Lrc=m_Path.substring(0,m_Path.length()-6)+".lrc";
+        }
+        m_Name=music.getName().substring(0,music.getName().length()-4);
+        m_Path_Lrc=m_Path.substring(0,m_Path.length()-4)+".lrc";
         m_Singer=music.getSinger();
         m_Duration=Scan.formatTime(music.getDuration());
         mName.setText(m_Name);

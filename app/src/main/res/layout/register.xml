@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+<android.support.v7.widget.Toolbar
+    android:id="@+id/registerBar"
+    android:layout_width="match_parent"
+    android:background="?attr/colorPrimary"
+    android:layout_height="?attr/actionBarSize">
+    <include layout="@layout/register_bar"/>
+</android.support.v7.widget.Toolbar>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -6,7 +16,6 @@
     android:gravity="center"
     android:orientation="vertical"
     android:weightSum="20">
-
     <EditText
         android:id="@+id/user_enter_register"
         android:layout_width="match_parent"
@@ -51,3 +60,4 @@
         android:text="@string/cancel"
         android:textSize="20sp" />
 </LinearLayout>
+</RelativeLayout>
