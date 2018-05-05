@@ -10,15 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Scan {
-    public static List<Music> getMusicData(Context context) {
+    public static List<Music> getMusicData(Context context) {        //getMusicData()方法为扫描本地音乐文件，
         List<Music> list = new ArrayList<>();
-        // 媒体库查询语句（写一个工具类MusicUtils）
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null,
-                null, MediaStore.Audio.AudioColumns.IS_MUSIC);
+                null, MediaStore.Audio.AudioColumns.IS_MUSIC);  //query搜索本地音频文件
         if (cursor != null) {
-            while (cursor.moveToNext()) {
-                Music music = new Music();
-                music.name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
+            while (cursor.moveToNext()) {                                  //指针每找到一个音乐文件
+                Music music = new Music();                                 //创造单例对象
+                music.name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));  //单例对象赋值名字，歌手名，文件路径，歌曲长度，文件大小
                 music.singer = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
                 music.path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
                 music.duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
@@ -30,19 +29,19 @@ public class Scan {
                         music.singer = str[0];
                         music.name = str[1];
                     }
-                    list.add(music);
+                    list.add(music);            //ArrayList内添加music
                 }
             }
             // 释放资源
             cursor.close();
         }
-        return list;
+        return list;                           //返回一个ArrayList
     }
 
     /**
      * 定义一个方法用来格式化获取到的时间
      */
-    public static String formatTime(long time) {
+    public static String formatTime(long time) {   //时间转换，将毫秒转换为分和秒
         if (time / 1000 % 60 < 10) {
             return time / 1000 / 60 + ":0" + time / 1000 % 60;
         } else {

@@ -1,6 +1,6 @@
 package t.n.b.v.c.music;
 
-public class Music {
+public class Music {    //音乐文件具有相关属性，有名字，歌手，文件路径，文件大小，歌曲长度(单位为毫秒)
     public String name;
     public String singer;
     public String path;
