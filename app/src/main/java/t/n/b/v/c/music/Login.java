@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -57,50 +58,53 @@ public class Login extends AppCompatActivity {
                 }
             }
         });
-        loginButton.setOnClickListener(view -> {                //登录按钮点击事件
-            SQLiteDatabase db=dbhelpder.getWritableDatabase();  //数据库写入操作
-            String loginUser=userEdit.getText().toString().trim(); //获取登录框字符
-            String loginPwd=pwdEdit.getText().toString().trim();   //获取密码框字符
-            if ((loginUser.length() == 0) && (loginPwd.length() != 0)) { //如果登录框为空而密码框不为空
-                Toast.makeText(Login.this, R.string.please_input_username, Toast.LENGTH_SHORT).show(); //显示提示消息"请输入用户名"
-            } else if ((loginPwd.length() == 0) && (loginUser.length() != 0)) { //如果登录框不为空而密码框为空
-                Toast.makeText(Login.this, R.string.please_input_password, Toast.LENGTH_SHORT).show(); //显示提示消息"请输入密码"
-            } else if ((loginUser.length() != 0) && (loginPwd.length() != 0)) { //如果登录框不为空且密码框不为空
-                Cursor cursor=db.query("data",null,null,null,null,null,null); //查询本地数据库表"table"
-                if (cursor.moveToFirst()) {  //cursor循环查询
-                    do {
-                        String username = cursor.getString(cursor.getColumnIndex("username"));
-                        String password=cursor.getString(cursor.getColumnIndex("password"));
-                        if (loginUser.equals(username)) {   //如果用户名和数据库内已存在的用户名相同，则往下比对密码
-                            if (loginPwd.equals(password)){ //如果密码也相同
-                                loginCode=1;                //loginCode状态码为1
-                                break;
-                            }else{
-                                loginCode=0;                //密码不符则为0
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {                //登录按钮点击事件
+                SQLiteDatabase db = dbhelpder.getWritableDatabase();  //数据库写入操作
+                String loginUser = userEdit.getText().toString().trim(); //获取登录框字符
+                String loginPwd = pwdEdit.getText().toString().trim();   //获取密码框字符
+                if ((loginUser.length() == 0) && (loginPwd.length() != 0)) { //如果登录框为空而密码框不为空
+                    Toast.makeText(Login.this, R.string.please_input_username, Toast.LENGTH_SHORT).show(); //显示提示消息"请输入用户名"
+                } else if ((loginPwd.length() == 0) && (loginUser.length() != 0)) { //如果登录框不为空而密码框为空
+                    Toast.makeText(Login.this, R.string.please_input_password, Toast.LENGTH_SHORT).show(); //显示提示消息"请输入密码"
+                } else if ((loginUser.length() != 0) && (loginPwd.length() != 0)) { //如果登录框不为空且密码框不为空
+                    Cursor cursor = db.query("data", null, null, null, null, null, null); //查询本地数据库表"table"
+                    if (cursor.moveToFirst()) {  //cursor循环查询
+                        do {
+                            String username = cursor.getString(cursor.getColumnIndex("username"));
+                            String password = cursor.getString(cursor.getColumnIndex("password"));
+                            if (loginUser.equals(username)) {   //如果用户名和数据库内已存在的用户名相同，则往下比对密码
+                                if (loginPwd.equals(password)) { //如果密码也相同
+                                    loginCode = 1;                //loginCode状态码为1
+                                    break;
+                                } else {
+                                    loginCode = 0;                //密码不符则为0
+                                    break;
+                                }
+                            } else {
+                                loginCode = 0;                    //数据库没找到相同用户名也为0
                                 break;
                             }
-                        } else {
-                            loginCode=0;                    //数据库没找到相同用户名也为0
-                            break;
-                        }
-                    } while (cursor.moveToFirst());
-                }
-                cursor.close(); //关闭cursor
-                if (loginCode == 1) {            //状态码为1情况下，账号密码都正确
-                        if (checkPermissions()){ //检查权限，如果得到权限
+                        } while (cursor.moveToFirst());
+                    }
+                    cursor.close(); //关闭cursor
+                    if (loginCode == 1) {            //状态码为1情况下，账号密码都正确
+                        if (Login.this.checkPermissions()) { //检查权限，如果得到权限
                             Intent intent = new Intent(Login.this, MainActivity.class);
-                            checkCheck();        //如果checkBox勾选
-                            startActivity(intent);
-                        }else {
-                            requestPermissions(STORAGE_PERMISSIONS,REQUEST_STORAGE_PERMISSIONS); //没得到权限则申请权限
+                            Login.this.checkCheck();        //如果checkBox勾选
+                            Login.this.startActivity(intent);
+                        } else {
+                            Login.this.requestPermissions(STORAGE_PERMISSIONS, REQUEST_STORAGE_PERMISSIONS); //没得到权限则申请权限
                         }
+                    } else {
+                        Toast.makeText(Login.this, R.string.wrong_user_pwd, Toast.LENGTH_SHORT).show(); //错误用户名密码提示
+                        userEdit.setText("");  //输入框清空
+                        pwdEdit.setText("");   //密码框清空
+                    }
                 } else {
-                    Toast.makeText(Login.this, R.string.wrong_user_pwd, Toast.LENGTH_SHORT).show(); //错误用户名密码提示
-                    userEdit.setText("");  //输入框清空
-                    pwdEdit.setText("");   //密码框清空
+                    Toast.makeText(Login.this, R.string.user_pwd_empty, Toast.LENGTH_SHORT).show(); //最后一种情况是两个输入框全为空
                 }
-            }else{
-                Toast.makeText(Login.this, R.string.user_pwd_empty,Toast.LENGTH_SHORT).show(); //最后一种情况是两个输入框全为空
             }
         });
     }

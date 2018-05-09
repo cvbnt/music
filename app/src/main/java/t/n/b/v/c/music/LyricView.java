@@ -106,16 +106,16 @@ public class LyricView extends View {
         return true;
     }
 
-    public void init(){
-        lrc_map = new TreeMap<Integer, LyricObject>();
-        offsetY=320;
+    public void init(){                                  //初始化
+        lrc_map = new TreeMap<Integer, LyricObject>();   //创建歌词对象
+        offsetY=320;                                     //offsetY赋值
 
-        paint=new Paint();
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setColor(getResources().getColor(R.color.colorPrimary));
-        paint.setAntiAlias(true);
-        paint.setDither(true);
-        paint.setAlpha(180);
+        paint=new Paint();                               //新建Paint对象
+        paint.setTextAlign(Paint.Align.CENTER);          //字符居中
+        paint.setColor(getResources().getColor(R.color.colorPrimary)); //设置颜色
+        paint.setAntiAlias(true);                        //设置抗锯齿
+        paint.setDither(true);                           //设置防抖动
+        paint.setAlpha(180);                             //设置透明度
 
 
         paintHL=new Paint();
@@ -131,10 +131,10 @@ public class LyricView extends View {
      */
 
     public void SetTextSize(){
-        if(!blLrc){
+        if(!blLrc){                               //如果blLrc不存在，则直接返回
             return;
         }
-        int max=lrc_map.get(0).lrc.length();
+        int max=lrc_map.get(0).lrc.length();      //如果blLrc存在，设置歌词长度
         for(int i=1;i<lrc_map.size();i++){
             LyricObject lrcStrLength=lrc_map.get(i);
             if(max<lrcStrLength.lrc.length()){
@@ -155,7 +155,7 @@ public class LyricView extends View {
      *
      * @return 返回歌词滚动的速度
      */
-    public Float SpeedLrc(){
+    public Float SpeedLrc(){                                    //设置歌词滚动速度
         float speed=0;
         if(offsetY+(SIZEWORD+INTERVAL)*lrcIndex>220){
             speed=((offsetY+(SIZEWORD+INTERVAL)*lrcIndex-220)/20);
@@ -199,27 +199,22 @@ public class LyricView extends View {
      * @param file 歌词的路径
      *
      */
-    public static void read(String file) {
+    public static void read(String file) {                          //读取歌词文件
         TreeMap<Integer, LyricObject> lrc_read =new TreeMap<Integer, LyricObject>();
         String data = "";
         try {
-            File saveFile=new File(file);
-            // System.out.println("是否有歌词文件"+saveFile.isFile());
+            File saveFile=new File(file);                           //检查是否有歌词文件
             if(!saveFile.isFile()){
                 blLrc=false;
                 return;
             }
             blLrc=true;
 
-            //System.out.println("bllrc==="+blLrc);
-            FileInputStream stream = new FileInputStream(saveFile);//  context.openFileInput(file);
-
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(stream,"GB2312"));
+            FileInputStream stream = new FileInputStream(saveFile);
+            BufferedReader br = new BufferedReader(new InputStreamReader(stream,"GB2312"));   //设置编码
             int i = 0;
             Pattern pattern = Pattern.compile("\\d{2}");
             while ((data = br.readLine()) != null) {
-                // System.out.println("++++++++++++>>"+data);
                 data = data.replace("[","");//将前面的替换成后面的
                 data = data.replace("]","@");
                 String splitdata[] =data.split("@");//分隔

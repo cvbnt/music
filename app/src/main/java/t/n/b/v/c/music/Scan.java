@@ -37,16 +37,11 @@ public class Scan {
         }
         return list;                           //返回一个ArrayList
     }
-
-    /**
-     * 定义一个方法用来格式化获取到的时间
-     */
     public static String formatTime(long time) {   //时间转换，将毫秒转换为分和秒
         if (time / 1000 % 60 < 10) {
             return time / 1000 / 60 + ":0" + time / 1000 % 60;
         } else {
             return time / 1000 / 60 + ":" + time / 1000 % 60;
         }
-
     }
 }
