@@ -8,10 +8,12 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.util.EventListener;
 import java.util.Random;
 
 import static java.lang.StrictMath.abs;
@@ -23,7 +25,7 @@ public class Play extends AppCompatActivity {
     String m_Duration;
     String m_Path_Lrc;
     int m_size;
-    Music music;
+    private Music music;
     int mGetPosition;
     private SeekBar mSeekBar;
     private ImageButton mPrevious;
@@ -99,8 +101,87 @@ public class Play extends AppCompatActivity {
                 }
             }
         });
-        mPrevious.setOnClickListener(view -> playPreviousSong());                //previous按钮设置为播放上一个歌曲
-        mNext.setOnClickListener(view -> playNextSong());                        //next按钮设置为播放下一个歌曲
+        mPrevious.setOnClickListener(view -> {
+            mPlay.setImageDrawable(getDrawable(R.drawable.ic_pause));  //当前播放按钮如果为Play，则设置为pause图片
+            DRAWABLE_STATE=1;
+            if ((REPEAT_STATE==1)&&(SHUFFLE_STATE==0)){
+                mMediaPlayer.pause();
+                mMediaPlayer.seekTo(0);
+                mMediaPlayer.start();
+            }else if ((REPEAT_STATE==0)&&(SHUFFLE_STATE==1)){
+                mMediaPlayer.stop();
+                int mRandomPosition=new Random().nextInt(1000);
+                mRandomPosition=abs(mRandomPosition)%m_size;
+                if (mRandomPosition==mGetPosition){
+                    mRandomPosition=mRandomPosition+1;
+                }
+                music=Scan.getMusicData(context).get(mRandomPosition);
+                m_Path=music.getPath();
+                if (m_Path.contains(TS)){                               //以下为为不同歌曲名后缀处理，获得相对应的路径和名字
+                    m_Name=music.getName().substring(0,music.getName().length()-3);
+                    m_Path_Lrc=m_Path.substring(0,m_Path.length()-3)+".lrc";
+                }else if (m_Path.contains(FLAC)||m_Path.contains(MXMF)){
+                    m_Name=music.getName().substring(0,music.getName().length()-5);
+                    m_Path_Lrc=m_Path.substring(0,m_Path.length()-5)+".lrc";
+                }else if (m_Path.contains(RTTTL)){
+                    m_Name=music.getName().substring(0,music.getName().length()-6);
+                    m_Path_Lrc=m_Path.substring(0,m_Path.length()-6)+".lrc";
+                }
+                m_Path_Lrc=m_Path.substring(0,m_Path.length()-4)+".lrc";
+                m_Name=music.getName().replace(".mp3","");
+                m_Singer=music.getSinger();
+                m_Duration=Scan.formatTime(music.getDuration());
+                mName.setText(m_Name);
+                mSinger.setText(m_Singer);
+                mDurationTime.setText(m_Duration);
+                initMediaPlayer(m_Path);
+                searchLrc();
+                mMediaPlayer.start();
+            }else {
+                playPreviousSong();
+            }
+        });                //previous按钮设置为播放上一个歌曲
+        mNext.setOnClickListener((View view) -> {
+            mPlay.setImageDrawable(getDrawable(R.drawable.ic_pause));  //当前播放按钮如果为Play，则设置为pause图片
+            DRAWABLE_STATE=1;
+            if ((REPEAT_STATE==1)&&(SHUFFLE_STATE==0)){
+                mMediaPlayer.pause();
+                mMediaPlayer.seekTo(0);
+                mMediaPlayer.start();
+            }else if ((REPEAT_STATE==0)&&(SHUFFLE_STATE==1)){
+                mMediaPlayer.stop();
+                mMediaPlayer.reset();
+                int mRandomPosition=new Random().nextInt(1000);
+                mRandomPosition=abs(mRandomPosition)%m_size;
+                if (mRandomPosition==mGetPosition){
+                    mRandomPosition=mRandomPosition+1;
+                }
+                music=Scan.getMusicData(context).get(mRandomPosition);
+                m_Path=music.getPath();
+                if (m_Path.contains(TS)){                               //以下为为不同歌曲名后缀处理，获得相对应的路径和名字
+                    m_Name=music.getName().substring(0,music.getName().length()-3);
+                    m_Path_Lrc=m_Path.substring(0,m_Path.length()-3)+".lrc";
+                }else if (m_Path.contains(FLAC)||m_Path.contains(MXMF)){
+                    m_Name=music.getName().substring(0,music.getName().length()-5);
+                    m_Path_Lrc=m_Path.substring(0,m_Path.length()-5)+".lrc";
+                }else if (m_Path.contains(RTTTL)){
+                    m_Name=music.getName().substring(0,music.getName().length()-6);
+                    m_Path_Lrc=m_Path.substring(0,m_Path.length()-6)+".lrc";
+                }
+                m_Path_Lrc=m_Path.substring(0,m_Path.length()-4)+".lrc";
+                m_Name=music.getName().replace(".mp3","");
+                m_Singer=music.getSinger();
+                m_Duration=Scan.formatTime(music.getDuration());
+                mName.setText(m_Name);
+                mSinger.setText(m_Singer);
+                mDurationTime.setText(m_Duration);
+                initMediaPlayer(m_Path);
+                searchLrc();
+                mMediaPlayer.start();
+            }else {
+                playNextSong();
+            }
+        });                        //next按钮设置为播放下一个歌曲
         mRepeat.setOnClickListener(view -> {                                     //重复按钮设置为在单曲循环播放和顺序播放间切换
             if (REPEAT_STATE==0){                                                //同时切换图片
                 REPEAT_STATE=1;
@@ -208,7 +289,6 @@ public class Play extends AppCompatActivity {
         refresh();
         initMediaPlayer(m_Path);
         searchLrc();
-        mPlay.setImageDrawable(getDrawable(R.drawable.ic_pause));
         mMediaPlayer.start();
     }
 
@@ -222,15 +302,16 @@ public class Play extends AppCompatActivity {
         refresh();                                                    //刷新操作
         initMediaPlayer(m_Path);                                      //根据文件路径载入歌曲
         searchLrc();                                                  //寻找歌词
-        mPlay.setImageDrawable(getDrawable(R.drawable.ic_pause));     //播放按钮设置成pause图片
         mMediaPlayer.start();                                         //开始播放
     }
     private void checkState(){                                        //当歌曲播放结束后，检查底部三个播放模式按钮的状态，根据不同状态进行不同播放
         if ((REPEAT_STATE==0)&&(SHUFFLE_STATE==0)){
             playNextSong();
         }else if ((REPEAT_STATE==1)&&(SHUFFLE_STATE==0)){
+            mMediaPlayer.stop();
             mMediaPlayer.start();
         }else if ((REPEAT_STATE==0)&&(SHUFFLE_STATE==1)){           //随机播放采用随机数赋值给POSITION
+            mMediaPlayer.reset();
             int mRandomPosition=new Random().nextInt(1000);
             mRandomPosition=abs(mRandomPosition)%m_size;
             if (mRandomPosition==mGetPosition){
@@ -238,6 +319,17 @@ public class Play extends AppCompatActivity {
             }
             music=Scan.getMusicData(context).get(mRandomPosition);
             m_Path=music.getPath();
+            if (m_Path.contains(TS)){                               //以下为为不同歌曲名后缀处理，获得相对应的路径和名字
+                m_Name=music.getName().substring(0,music.getName().length()-3);
+                m_Path_Lrc=m_Path.substring(0,m_Path.length()-3)+".lrc";
+            }else if (m_Path.contains(FLAC)||m_Path.contains(MXMF)){
+                m_Name=music.getName().substring(0,music.getName().length()-5);
+                m_Path_Lrc=m_Path.substring(0,m_Path.length()-5)+".lrc";
+            }else if (m_Path.contains(RTTTL)){
+                m_Name=music.getName().substring(0,music.getName().length()-6);
+                m_Path_Lrc=m_Path.substring(0,m_Path.length()-6)+".lrc";
+            }
+            m_Path_Lrc=m_Path.substring(0,m_Path.length()-4)+".lrc";
             m_Name=music.getName().replace(".mp3","");
             m_Singer=music.getSinger();
             m_Duration=Scan.formatTime(music.getDuration());
