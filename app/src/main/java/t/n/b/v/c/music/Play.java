@@ -307,8 +307,9 @@ public class Play extends AppCompatActivity {
     private void checkState(){                                        //当歌曲播放结束后，检查底部三个播放模式按钮的状态，根据不同状态进行不同播放
         if ((REPEAT_STATE==0)&&(SHUFFLE_STATE==0)){
             playNextSong();
-        }else if ((REPEAT_STATE==1)&&(SHUFFLE_STATE==0)){
-            mMediaPlayer.stop();
+        }else if ((REPEAT_STATE==1)&&(SHUFFLE_STATE==0)){           //单曲循环
+            mMediaPlayer.pause();
+            mMediaPlayer.seekTo(0);
             mMediaPlayer.start();
         }else if ((REPEAT_STATE==0)&&(SHUFFLE_STATE==1)){           //随机播放采用随机数赋值给POSITION
             mMediaPlayer.reset();
